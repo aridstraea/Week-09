@@ -10,36 +10,31 @@ class Card {
         this.faceValue = faceValue;
     }
 
-
-
-    getSuit() {
-        return this.suit;
+    getSuit() { // Return the suit of the card.
+        return this.suit; // Suit will be pulled from the suits array at runtime.
     }
 
-    getFaceValue() {
-        return this.faceValue;
+    getFaceValue() { // Return the face value of the card.
+        return this.faceValue; // Face Value will be used to determine rank at runtime.
     }
 
-    getRank() {
-        return standardCardValues.get(this.faceValue);
+    getRank() { // Return the rank of the card.
+        return standardCardValues.get(this.faceValue); // Rank will be pulled from the standardCardValues map at runtime.
     }
 
-    describe() {
+    describe() { // Return the rank and suit of the card.
         let rank = this.getRank();
-        return `${rank} of ${this.suit}`;
+        return `${rank} of ${this.suit}`; // [Rank] of [Suit], e.g. "Two of Hearts"
     }
 }
 
 class Deck {
-
     constructor() {
         console.log('Creating a new deck.');
         this.deck = [];
-        for (let i = 0; i < suits.length; i++) {
-            console.log('Current Suit: ' + suits[i]);
-            for (let j = 2; j <= (standardCardValues.size + 1); j++) {
-                console.log('Current Rank: ' + standardCardValues.get(j));
-                this.deck.push(new Card(j, suits[i]));
+        for (let i = 0; i < suits.length; i++) { // For each suit i
+            for (let j = 2; j <= (standardCardValues.size + 1); j++) { // For each face value j
+                this.deck.push(new Card(j, suits[i])); // Add a new card to the deck: [Face Value] of [Suit]
             }
         }
     }
@@ -47,21 +42,20 @@ class Deck {
     describe() {
         let cardList = '';
         this.deck.forEach(element => {
-            cardList += element.describe() + '\n';
+            cardList += element.describe() + '\n'; // Add each card to the card list
         });
-        return cardList;
+        return cardList; // Return the card list
     }
 
     getDeck() {
-        return this.deck;
+        return this.deck; // Return the deck
     }
 
     // I found this cool shuffle function on stackoverflow
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array 
     shuffle() {
-        let deck = this.deck;
-        
-        let currentIndex = deck.length;
+        let deck = this.deck; // Get the deck
+        let currentIndex = deck.length; // Get the length of the deck
 
         // While there remain elements to shuffle...
         while (currentIndex != 0) {
@@ -87,38 +81,39 @@ class Player {
         this.hand = [];
     }
 
-    getName() {
+    getName() { // Return the player's name
         return this.name;
     }
 
-    getScore() {
+    getScore() { // Return the player's score
         return this.score;
     }
 
-    getHand() {
+    getHand() { // Return the player's hand
         return this.hand;
     }
 
-    describe() {
+    describe() { 
         let hand = '';
 
         this.hand.forEach(element => {
-            hand += element.describe() + '\n';
+            hand += element.describe() + '\n'; // Add each card to the hand
         });
 
-        return `${this.name} has ${this.score} points and the following cards:\n${hand}`;
+        return `${this.name} has ${this.score} points and the following cards:\n${hand}`; // Return the player's name, score, and hand
+        // [Player Name] has [Player Score] points and the following cards: [Card 1], [Card 2], ... [Card n]
     }
 
     incrementScore() {
-        this.score++;
+        this.score++; // Increment the player's score
     }
 
     flipCard() {
-        return this.hand.shift();
+        return this.hand.shift(); // Remove the top card from the player's hand and return it
     }
 
     drawCard(deck) {
-        this.hand.push(deck.draw());
+        this.hand.push(deck.draw()); // Add a card to the player's hand, removing it from deck
     }
 }
 
@@ -128,16 +123,16 @@ class Game {
         this.deck = new Deck();
     }
 
-    addPlayer(name) {
+    addPlayer(name) { // Add a player to the game
         this.players.push(new Player(name));
     }
 
-    dealCards() {
+    dealCards() { // Deal cards to the players
         let deck = this.deck;
-        deck.shuffle(deck);
-
         let player1 = this.players[0];
-        let player2 = this.players[1];
+        let player2 = this.players[1]; // I find it easier to reference the players by name
+
+        deck.shuffle(deck);
         for (let i = 0; i < standardDeckSize; i++) {
             if (i % 2 == 0) { // even numbers; player 2 (goes second)
                 player2.drawCard(deck);
@@ -149,7 +144,7 @@ class Game {
 
     playGame() {
         let player1 = this.players[0];
-        let player2 = this.players[1];
+        let player2 = this.players[1]; // I find it easier to reference the players by name
 
         for (let i = 0; i < standardDeckSize / 2; i++) {
             console.log("***** ROUND " + (i + 1) + " *****");
@@ -162,48 +157,57 @@ class Game {
       
             // Determine this round's winner
             let roundOutput = '';
-            if (player1card.getFaceValue() > player2card.getFaceValue()) {
+            if (player1card.getFaceValue() > player2card.getFaceValue()) { // Player 1 wins
                 roundOutput = `\t${player1.getName()} wins the round! They have been awarded a point.`;
                 player1.incrementScore();
-            } else if (player1card.getFaceValue() < player2card.getFaceValue()) {
+            } else if (player1card.getFaceValue() < player2card.getFaceValue()) { // Player 2 wins
                 roundOutput = `\t${player2.getName()} wins the round! They have been awarded a point.`;
                 player2.incrementScore();
-            } else {
+            } else { // Tie
                 roundOutput = "\tThis round is a tie! No point is awarded.";
             }
             console.log("\n" + roundOutput);
       
             // Output scores
-            console.log(this.getCurrentScores(player1, player2));
+            console.log(this.getCurrentScores());
         }
+        console.log("***** GAME OVER *****");
+        console.log("The final scores are:");
+        console.log(this.getCurrentScores());
+        console.log(this.getWinner());
     }
 
-    getCurrentScores(player1, player2) {
-        return `${player1.getName()}: ${player1.getScore()} points\n${player2.getName()}: ${player2.getScore()} points`;
+    getCurrentScores() {
+        let player1 = this.players[0];
+        let player2 = this.players[1]; // I find it easier to reference the players by name
+
+        // Return the player's name and score. Highest points return first.
+        if (player1.getScore() >= player2.getScore()) return `${player1.getName()}: ${player1.getScore()} points\n${player2.getName()}: ${player2.getScore()} points`; 
+        else return `${player2.getName()}: ${player2.getScore()} points\n${player1.getName()}: ${player1.getScore()} points`;
     }
 
     getWinner() {
         let player1 = this.players[0];
-        let player2 = this.players[1];
+        let player2 = this.players[1]; // I find it easier to reference the players by name
 
         let winner = '';
         if (player1.getScore() > player2.getScore()) {
-            winner = `${player1.getName()} wins the game!`;
+            winner = `${player1.getName()} wins the game!`; // Player 1 wins
         } else if (player1.getScore() < player2.getScore()) {
-            winner = `${player2.getName()} wins the game!`;
+            winner = `${player2.getName()} wins the game!`; // Player 2 wins
         } else {
-            winner = `The game is a tie!`;
+            winner = `The game is a tie!`; // Tie
         }
         return winner;
     }
 }
 
     // Constants
-var suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
-var standardCardValues = intializeStandardCardValues();
-var standardDeckSize = standardCardValues.size * suits.length;
+var suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'] // Card suits
+var standardCardValues = intializeStandardCardValues(); // Card values
+var standardDeckSize = standardCardValues.size * suits.length; // Deck size
     // Utility
-function intializeStandardCardValues() {
+function intializeStandardCardValues() { // Initialize standard card values
     let values = new Map();
 
     values.set(2, "Two");
@@ -224,13 +228,12 @@ function intializeStandardCardValues() {
 }
 
 // Run Game below.
-
 let game = new Game();
 
 // Add 2 players to the game
 game.addPlayer('Player 1');
 game.addPlayer('Player 2');
 
+// Deal cards to the players & play game
 game.dealCards();
 game.playGame();
-console.log(game.getWinner());
